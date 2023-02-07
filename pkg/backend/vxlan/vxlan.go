@@ -129,7 +129,11 @@ func (be *VXLANBackend) RegisterNetwork(ctx context.Context, wg *sync.WaitGroup,
 	}{
 		VNI: defaultVNI,
 	}
+	// feature VNI info
 
+	if config.VNI >= 1 {
+		cfg.VNI = config.VNI
+	}
 	if len(config.Backend) > 0 {
 		if err := json.Unmarshal(config.Backend, &cfg); err != nil {
 			return nil, fmt.Errorf("error decoding VXLAN backend config: %v", err)

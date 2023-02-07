@@ -38,6 +38,7 @@ type Config struct {
 	IPv6SubnetMin *ip.IP6
 	IPv6SubnetMax *ip.IP6
 	SubnetLen     uint
+	VNI           int
 	IPv6SubnetLen uint
 	BackendType   string          `json:"-"`
 	Backend       json.RawMessage `json:",omitempty"`

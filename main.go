@@ -29,9 +29,9 @@ import (
 	"time"
 
 	"github.com/coreos/pkg/flagutil"
-	"github.com/flannel-io/flannel/pkg/iptables"
 	"github.com/flannel-io/flannel/pkg/ip"
 	"github.com/flannel-io/flannel/pkg/ipmatch"
+	"github.com/flannel-io/flannel/pkg/iptables"
 	"github.com/flannel-io/flannel/pkg/subnet"
 	etcd "github.com/flannel-io/flannel/pkg/subnet/etcd"
 	"github.com/flannel-io/flannel/pkg/subnet/kube"
@@ -89,6 +89,7 @@ type CmdLineOpts struct {
 	subnetLeaseRenewMargin    int
 	healthzIP                 string
 	healthzPort               int
+	vni                       int
 	iptablesResyncSeconds     int
 	iptablesForwardRules      bool
 	netConfPath               string
@@ -126,6 +127,7 @@ func init() {
 	flannelFlags.BoolVar(&opts.version, "version", false, "print version and exit")
 	flannelFlags.StringVar(&opts.healthzIP, "healthz-ip", "0.0.0.0", "the IP address for healthz server to listen")
 	flannelFlags.IntVar(&opts.healthzPort, "healthz-port", 0, "the port for healthz server to listen(0 to disable)")
+	flannelFlags.IntVar(&opts.vni, "vni", 0, "vxlan vni id")
 	flannelFlags.IntVar(&opts.iptablesResyncSeconds, "iptables-resync", 5, "resync period for iptables rules, in seconds")
 	flannelFlags.BoolVar(&opts.iptablesForwardRules, "iptables-forward-rules", true, "add default accept rules to FORWARD chain in iptables")
 	flannelFlags.StringVar(&opts.netConfPath, "net-config-path", "/etc/kube-flannel/net-conf.json", "path to the network configuration file")
@@ -317,6 +319,10 @@ func main() {
 			log.Error("Failed to find interface to use that matches the interfaces and/or regexes provided")
 			os.Exit(1)
 		}
+	}
+
+	if opts.vni > 0 {
+		config.VNI = opts.vni
 	}
 
 	// Create a backend manager then use it to create the backend and register the network with it.
